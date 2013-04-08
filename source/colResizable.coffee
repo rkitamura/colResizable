@@ -1,16 +1,14 @@
 (($) ->
 
   d = $(document) # window object
-  h = $("head")   # head object
+  h = $('head')   # head object
   drag = null     # reference to the current grip that is being dragged
   tables = []     # array of the already processed tables (table.id as key)
   count = 0       # internal count to create unique IDs when needed.
 
   # common strings for minification
   # (in the minified version there are plenty more)
-  ID = "id"
-  PX = "px"
-  SIGNATURE = "JColResizer"
+  SIGNATURE = 'JColResizer'
 
   # shortcuts
   ie = navigator.userAgent.toLowerCase().match(/(msie)/)
@@ -55,16 +53,16 @@
     # the user is asking to destroy a previously colResized table
     return destroy(t)  if options.disable
     # its id is obtained, if null new one is generated
-    id = t.id = t.attr(ID) or SIGNATURE + count++
+    id = t.id = t.attr('id') or SIGNATURE + count++
     # shortcut to detect postback safe
     t.p = options.postbackSafe
     # if the object is not a table or
     # if it was already processed then it is ignored.
-    return if not t.is("table") or tables[id]
+    return if not t.is('table') or tables[id]
     # the grips container object is added.
     # Signature class forces table rendering in fixed-layout mode
     #  to prevent column's min-width
-    t.addClass(SIGNATURE).attr(ID, id).before "<div class=\"JCLRgrips\"/>"
+    t.addClass(SIGNATURE).attr('id', id).before '<div class="JCLRgrips"/>'
     t.opt = options
     # t.c and t.g are arrays of columns and grips respectively
     t.g = []
@@ -74,8 +72,8 @@
     # if the table contains margins, it must be specified
     # since there is no (direct) way to obtain margin values in
     #  its original units (%, em, ...)
-    t.gc.css "marginLeft", options.marginLeft if options.marginLeft
-    t.gc.css "marginRight", options.marginRight if options.marginRight
+    t.gc.css 'marginLeft', options.marginLeft if options.marginLeft
+    t.gc.css 'marginRight', options.marginRight if options.marginRight
     # table cellspacing (not even jQuery is fully cross-browser)
     if ie
       cellspacing = tb.cellSpacing or tb.currentStyle.borderSpacing
@@ -105,10 +103,10 @@
   ###
   destroy = (t) ->
     # its table object is found
-    id = t.attr(ID)
+    id = t.attr 'id'
     t = tables[id]
     # if none, then it wasnt processed
-    return if not t or not t.is("table")
+    return if not t or not t.is('table')
     # class and grips are removed
     t.removeClass(SIGNATURE).gc.remove()
     # clean up data
@@ -121,7 +119,7 @@
   createGrips = (t) ->
     # if table headers are specified in its semantically
     #   correct tag, are obtained
-    th = t.find(">thead>tr>th,>thead>tr>td")
+    th = t.find '>thead>tr>th,>thead>tr>td'
     # but headers can also be included in different ways
     unless th.length
       selectors = [
@@ -143,7 +141,7 @@
       # jquery wrap for the current column
       c = $(this)
       # add the visual node to be used as grip
-      g = $(t.gc.append("<div class=\"JCLRgrip\"></div>")[0].lastChild)
+      g = $(t.gc.append('<div class="JCLRgrip"></div>')[0].lastChild)
       # some values are stored in the grip's node data
       g.t = t
       g.i = i
@@ -153,7 +151,7 @@
       t.g.push g
       t.c.push c
       # the width of the column is converted into pixel-based measurements
-      c.width(c.w).removeAttr "width"
+      c.width(c.w).removeAttr 'width'
       # bind the mousedown event to start dragging
       if i < t.ln - 1
         hoverStyle = """
@@ -164,23 +162,23 @@
          .append hoverStyle
       else
         # the last grip is used only to store data
-        g.addClass("JCLRLastGrip").removeClass "JCLRgrip"
+        g.addClass('JCLRLastGrip').removeClass 'JCLRgrip'
       # grip index and its table name are stored in the HTML
       g.data SIGNATURE,
         i: i
-        t: t.attr(ID)
+        t: t.attr 'id'
 
     # remove the width attribute from elements in the colgroup (in any)
-    t.cg.removeAttr "width"
+    t.cg.removeAttr 'width'
     # the grips are positioned according to the current table layout
     syncGrips t
     # there is a small problem, some cells in the table
     #   could contain dimension values interfering with the
     # width value set by this plugin. Those values are removed
-    t.find("td, th").not(th).not("table th, table td").each ->
+    t.find('td, th').not(th).not('table th, table td').each ->
       # the width attribute is removed from all table cells
       #  which are not nested in other tables and dont belong to the header
-      $(this).removeAttr "width"
+      $(this).removeAttr 'width'
 
 
   ###
@@ -198,38 +196,38 @@
     aux = []
     # in deserialization mode (after a postback)
     if th
-      t.cg.removeAttr "width"
+      t.cg.removeAttr 'width'
       # if flush is activated, stored data is removed
       if t.opt.flush
-        S[t.id] = ""
+        S[t.id] = ''
         return
       # column widths is obtained
-      w = S[t.id].split(";")
+      w = S[t.id].split(';')
       # for each column
       while i < t.ln
         # width is stored in an array since it will be required
         #  again a couple of lines ahead
-        aux.push 100 * w[i] / w[t.ln] + "%"
+        aux.push 100 * w[i] / w[t.ln] + '%'
         # each column width in % is resotred
-        th.eq(i).css "width", aux[i]
+        th.eq(i).css 'width', aux[i]
         i++
       i = 0
       while i < t.ln
         # this code is required in order to create an inline
         #   CSS rule with higher precedence than an existing CSS
         #   class in the "col" elements
-        t.cg.eq(i).css "width", aux[i]
+        t.cg.eq(i).css 'width', aux[i]
         i++
     else
       ## in serialization mode (after resizing a column)
       # clean up previous data
-      S[t.id] = ""
+      S[t.id] = ''
       # iterate through columns
       for i of t.c
         # width is obtained
         w = t.c[i].width()
         # width is appended to the sessionStorage object using ID as key
-        S[t.id] += w + ";"
+        S[t.id] += w + ';'
         # carriage is updated to obtain the full size used by columns
         m += w
       # the last item of the serialized string
@@ -254,8 +252,9 @@
         height = t.c[0].outerHeight()
       else
         height = t.outerHeight()
+      left = c.offset().left - t.offset().left + c.outerWidth() + t.cs / 2
       t.g[i].css
-        left: c.offset().left - t.offset().left + c.outerWidth() + t.cs / 2 + PX
+        left: "#{left}px"
         height: height
       i++
 
@@ -277,10 +276,10 @@
     # their new width is obtained and set
     w = c.w + inc
     w2 = c2.w - inc
-    c.width w + PX
-    c2.width w2 + PX
-    t.cg.eq(i).width w + PX
-    t.cg.eq(i + 1).width w2 + PX
+    c.width "#{w}px"
+    c2.width "#{w2}px"
+    t.cg.eq(i).width "#{w}px"
+    t.cg.eq(i + 1).width "#{w2}px"
     if isOver
       c.w = w
       c2.w = w2
@@ -314,7 +313,7 @@
     x = Math.max(min, Math.min(max, x))
     # apply position increment
     drag.x = x
-    drag.css "left", x + PX
+    drag.css 'left', "#{x}px"
     # if liveDrag is enabled
     if t.opt.liveDrag
       # columns and grips are synchronized
@@ -333,9 +332,9 @@
   Event handler fired when the dragging is over, updating table layout
   ###
   onGripDragOver = (e) ->
-    d.unbind("mousemove." + SIGNATURE).unbind "mouseup." + SIGNATURE
+    d.unbind("mousemove.#{SIGNATURE}").unbind "mouseup.#{SIGNATURE}"
     # remove the dragging cursor style
-    $("head :last-child").remove()
+    $('head :last-child').remove()
     return  unless drag
     # remove the grip's dragging css-class
     drag.removeClass drag.t.opt.draggingClass
@@ -372,8 +371,8 @@
     g.ox = e.pageX
     g.l = g.position().left
     # mousemove and mouseup events are bound
-    d.bind "mousemove." + SIGNATURE, onGripDrag
-    d.bind "mouseup." + SIGNATURE, onGripDragOver
+    d.bind "mousemove.#{SIGNATURE}", onGripDrag
+    d.bind "mouseup.#{SIGNATURE}", onGripDragOver
     # change the mouse cursor
     h.append """
     <style type='text/css'>
@@ -426,15 +425,15 @@
         #   For now, lets keep things simple...
         i = 0
         while i < t.ln
-          width = Math.round(1000 * t.c[i].w / mw) / 10 + "%"
-          t.c[i].css("width", width).l = true
+          width = Math.round(1000 * t.c[i].w / mw) / 10 + '%'
+          t.c[i].css('width', width).l = true
           i++
 
       #c.l locks the column, telling us that its c.w is outdated
       syncGrips t.addClass(SIGNATURE)
 
   #bind resize event, to update grips position
-  $(window).bind "resize." + SIGNATURE, onResize
+  $(window).bind "resize.#{SIGNATURE}", onResize
 
   ###
   The plugin is added to the jQuery library
@@ -445,10 +444,10 @@
       ## ATTRIBUTES
       # css-class used when a grip is being dragged
       #   (for visual feedback purposes)
-      draggingClass: "JCLRgripDrag"
+      draggingClass: 'JCLRgripDrag'
       # if it is required to use a custom grip
       #   it can be done using some custom HTML
-      gripInnerHtml: ""
+      gripInnerHtml: ''
       # enables table-layout updaing while dragging
       liveDrag: false
       # minimum width value in pixels allowed for a column
@@ -457,9 +456,9 @@
       #   will be bounded to the size of the first row
       headerOnly: false
       # cursor to be used on grip hover
-      hoverCursor: "e-resize"
+      hoverCursor: 'e-resize'
       # cursor to be used while dragging
-      dragCursor: "e-resize"
+      dragCursor: 'e-resize'
       # when it is enabled, table layout can persist after postback.
       #   It requires browsers with sessionStorage support
       #   (it can be emulated with sessionStorage.js).
