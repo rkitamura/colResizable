@@ -44,57 +44,58 @@
   ###
   Function to allow column resizing for table objects.
   It is the starting point to apply the plugin.
-  @param {DOM node} tb - refrence to the DOM table object to be enhanced
+  @param {DOM node} table - reference to the DOM table object to be enhanced
   @param {Object} options	- some customization values
   ###
-  init = (tb, options) ->
+  init = (table, options) ->
     # the table object is wrapped
-    t = $(tb)
+    $table = $(table)
     # the user is asking to destroy a previously colResized table
-    return destroy(t)  if options.disable
+    if options.disable
+      return destroy($table)
     # its id is obtained, if null new one is generated
-    id = t.id = t.attr('id') or SIGNATURE + count++
+    id = $table.id = $table.attr('id') or "#{SIGNATURE}#{count++}"
     # shortcut to detect postback safe
-    t.p = options.postbackSafe
+    $table.p = options.postbackSafe
     # if the object is not a table or
     # if it was already processed then it is ignored.
-    return if not t.is('table') or tables[id]
+    return if not $table.is('table') or tables[id]
     # the grips container object is added.
     # Signature class forces table rendering in fixed-layout mode
     #  to prevent column's min-width
-    t.addClass(SIGNATURE).attr('id', id).before '<div class="JCLRgrips"/>'
-    t.opt = options
-    # t.c and t.g are arrays of columns and grips respectively
-    t.g = []
-    t.c = []
-    t.w = t.width()
-    t.gc = t.prev()
+    $table.addClass(SIGNATURE).attr('id', id).before '<div class="JCLRgrips"/>'
+    $table.opt = options
+    # $table.c and $table.g are arrays of columns and grips respectively
+    $table.g = []
+    $table.c = []
+    $table.w = $table.width()
+    $table.gc = $table.prev()
     # if the table contains margins, it must be specified
     # since there is no (direct) way to obtain margin values in
     #  its original units (%, em, ...)
-    t.gc.css 'marginLeft', options.marginLeft if options.marginLeft
-    t.gc.css 'marginRight', options.marginRight if options.marginRight
+    $table.gc.css 'marginLeft', options.marginLeft if options.marginLeft
+    $table.gc.css 'marginRight', options.marginRight if options.marginRight
     # table cellspacing (not even jQuery is fully cross-browser)
     if ie
-      cellspacing = tb.cellSpacing or tb.currentStyle.borderSpacing
+      cellspacing = table.cellSpacing or table.currentStyle.borderSpacing
     else
-      cellspacing = t.css 'border-spacing'
-    t.cs = parseInt(cellspacing, 10) or 2
+      cellspacing = $table.css 'border-spacing'
+    $table.cs = parseInt(cellspacing, 10) or 2
     # outer border width (again cross-browser isues)
     if ie
-      borderWidth = tb.border or tb.currentStyle.borderLeftWidth
+      borderWidth = table.border or table.currentStyle.borderLeftWidth
     else
-      borderWidth = t.css 'border-left-width'
-    t.b = parseInt(borderWidth, 10) or 1
+      borderWidth = $table.css 'border-left-width'
+    $table.b = parseInt(borderWidth, 10) or 1
     # I am not an IE fan at all, but it is a pitty that only IE has
     #   the currentStyle attribute working as expected. For this reason
     #   I cannot check easily if the table has an explicit width
     #   or if it is rendered as "auto"
-    # if(!(tb.style.width || tb.width)) t.width(t.width());
+    # if(!(table.style.width || table.width)) $table.width($table.width());
     # the table object is stored using its id as key
-    tables[id] = t
+    tables[id] = $table
     # grips are created
-    createGrips t
+    createGrips $table
 
   ###
   This function allows to remove any enhancements performed
