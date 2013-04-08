@@ -100,6 +100,7 @@ module.exports = (grunt) ->
         globals:
           document: true
           jQuery: true
+          navigator: true
           sessionStorage: true
           window: true
 

@@ -13,7 +13,7 @@
   SIGNATURE = "JColResizer"
 
   # shortcuts
-  ie = $.browser.msie
+  ie = navigator.userAgent.toLowerCase().match(/(msie)/)
   S = undefined
   try # Firefox crashes when executed as local file system
     S = sessionStorage
@@ -28,7 +28,7 @@
         padding-right:0!important;
       }
       .JCLRgrips {height:0px; position:relative;}
-      .JCLRgrip {margin-left:-5px; position:absolute; z-index:5;}
+      .JCLRgrip {margin-left:-5px; position:absolute; z-index:1;}
       .JCLRgrip .JColResizer {
         position:absolute;
         background-color:red;
